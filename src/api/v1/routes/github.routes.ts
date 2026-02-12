@@ -1,13 +1,16 @@
-import {Router} from "express";
+import { Router } from "express";
 import authMiddleware from "../middleware/auth.middleware";
-import { analyzeGithubRepo, getGithubRepos } from "../controllers/integrations/githubAnalysis.controller";
-import { generateGithubSkills } from "../controllers/github/userskill.controller";
-
+import {
+  analyzeGithubRepo,
+  getAllGithubRepos,
+} from "../controllers/github/githubAnalysis.controller";
+import { evaluateGithubRepoSkill } from "../controllers/github/githubSkill.controller";
+// import { generateGithubSkills } from "../controllers/github/userskill.controller";
 
 const githubrouter = Router();
 
-githubrouter.get("/repos", authMiddleware, getGithubRepos);
+githubrouter.get("/repos", authMiddleware, getAllGithubRepos);
 githubrouter.post("/analyze", authMiddleware, analyzeGithubRepo);
 
-githubrouter.post("/skills", authMiddleware, generateGithubSkills);
+githubrouter.post("/skills", authMiddleware, evaluateGithubRepoSkill);
 export default githubrouter;
