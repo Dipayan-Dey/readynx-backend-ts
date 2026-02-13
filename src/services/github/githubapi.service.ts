@@ -9,19 +9,25 @@ const getHeaders = (token: string) => ({
 const paginate = async (
   urlGenerator: (page: number) => string,
   token: string,
+  maxPages = 5 // ✅ Limit to 5 pages by default (500 items)
 ) => {
   let page = 1;
   let results: any[] = [];
 
-  while (true) {
-    const { data } = await axios.get(urlGenerator(page), {
-      headers: getHeaders(token),
-    });
+  while (page <= maxPages) {
+    try {
+      const { data } = await axios.get(urlGenerator(page), {
+        headers: getHeaders(token),
+      });
 
-    if (!data || data.length === 0) break;
+      if (!data || data.length === 0) break;
 
-    results = [...results, ...data];
-    page++;
+      results = [...results, ...data];
+      page++;
+    } catch (error) {
+      console.error(`Error fetching page ${page}:`, error);
+      break; 
+    }
   }
 
   return results;
@@ -30,13 +36,17 @@ const paginate = async (
 const fetchStatsWithRetry = async (url: string, token: string) => {
   const headers = getHeaders(token);
 
-  for (let i = 0; i < 6; i++) {
-    const res = await axios.get(url, { headers });
+  for (let i = 0; i < 3; i++) { // Reduced retry count to 3
+    try {
+      const res = await axios.get(url, { headers });
 
-    if (res.status === 200 && res.data) {
-      return res.data;
+      if (res.status === 200 && res.data) {
+        return res.data;
+      }
+    } catch (error) {
+       console.warn(`Retry ${i + 1} failed for ${url}`);
     }
-
+    
     await new Promise((r) => setTimeout(r, 2000));
   }
 
@@ -118,16 +128,19 @@ export const fetchFullRepoData = async (
   const commits = await paginate(
     (page) => GITHUB_URLS.repoCommits(repoFullName, page),
     token,
+    5 // fetch max 500 commits
   );
 
   const pulls = await paginate(
     (page) => GITHUB_URLS.repoPulls(repoFullName, page),
     token,
+    5 // fetch max 500 PRs
   );
 
   const issues = await paginate(
     (page) => GITHUB_URLS.repoIssues(repoFullName, page),
     token,
+    5 // fetch max 500 issues
   );
 
   return {

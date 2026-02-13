@@ -4,27 +4,31 @@ export const getUserProjects = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId;
 
-    const page = Number(req.query.page) || 1; // ✅ ADDED
-    const limit = Number(req.query.limit) || 10; // ✅ ADDED
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const search = (req.query.search as string) || ""; // ✅ Added search
+    const skip = (page - 1) * limit;
 
-    const skip = (page - 1) * limit; // ✅ ADDED
+    const query: any = { userId };
+    if (search) {
+      query.repoName = { $regex: search, $options: "i" };
+    }
 
-    const projects = await ProjectModel.find({ userId })
+    const projects = await ProjectModel.find(query)
       .sort({ createdAt: -1 })
-      .skip(skip) // ✅ ADDED
-      .limit(limit) // ✅ ADDED
-      .select("repoName repoUrl repoFullName createdAt"); // ✅ CHANGED (light fields only)
+      .skip(skip) 
+      .limit(limit);
+      // .select("repoName repoUrl repoFullName createdAt"); // Removed select to return all stats for current display
 
-    const total = await ProjectModel.countDocuments({ userId });
+    const total = await ProjectModel.countDocuments(query);
 
     return res.status(200).json({
       success: true,
       data: projects,
-      pagination: {
-        total,
-        page,
-        pages: Math.ceil(total / limit),
-      },
+      totalRecords: total, // ✅ Matches frontend
+      totalPages: Math.ceil(total / limit), // ✅ Matches frontend
+      page,
+      limit,
     });
   } catch (error: any) {
     return res.status(500).json({

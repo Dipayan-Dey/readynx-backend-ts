@@ -6,23 +6,23 @@ export interface IUserSkill {
   projectId: Types.ObjectId;
   projectName: string;
 
-  // 🔹 Core Skill Scores (0–100)
+ 
   technicalDepthScore: number;
   collaborationScore: number;
   consistencyScore: number;
   architectureScore: number;
   maturityScore: number;
 
-  // 🔹 Language-Based Skill Levels
+
   languageSkills: {
     skillName: string;
    level: 1 | 2 | 3 | 4 | 5;
 
-    confidence: number; // 0–1
-    weightedScore: number; // 0–100
+    confidence: number; 
+    weightedScore: number; 
   }[];
 
-  // 🔹 Derived Engineering Skills
+ 
   engineeringSkills: {
     gitWorkflowLevel: 1 | 2 | 3 | 4 | 5;
     testingLevel: 1 | 2 | 3 | 4 | 5;
@@ -31,16 +31,16 @@ export interface IUserSkill {
     collaborationLevel: 1 | 2 | 3 | 4 | 5;
   };
 
-  // 🔹 Gap Detection
+  
   gaps: string[];
   strengths: string[];
   improvementAreas: string[];
 
-  // 🔹 Overall Results
-  overallScore: number; // 0–100
+  
+  overallScore: number; 
   overallLevel: 1 | 2 | 3 | 4 | 5;
-  careerReadinessIndex: number; // 0–100
-  confidenceScore: number; // final confidence
+  careerReadinessIndex: number; 
+  confidenceScore: number; 
 
   evaluatedAt: Date;
 }

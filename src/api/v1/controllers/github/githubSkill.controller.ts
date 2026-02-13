@@ -58,7 +58,8 @@ export const evaluateGithubRepoSkill = async (
     }
 
     // 🔹 3️⃣ Evaluate skill
-    const skillResult = evaluateSkill(project);
+    const projectObject = project.toObject();
+    const skillResult = evaluateSkill(projectObject);
 
     // 🔹 4️⃣ Save skill
     const savedSkill = await UserSkillModel.create({
@@ -111,6 +112,50 @@ export const evaluateGithubRepoSkill = async (
     return res.status(500).json({
       success: false,
       message: "Skill evaluation failed",
+      error: error.message,
+    });
+  }
+};
+
+
+export const getAllUserSkills = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.userId;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const search = (req.query.search as string) || "";
+    const skip = (page - 1) * limit;
+
+    const query: any = { userId };
+    
+    // UserSkillModel has `projectName` directly, so we can search it
+    if (search) {
+      query.projectName = { $regex: search, $options: "i" };
+    }
+
+    const skills = await UserSkillModel.find(query)
+      .sort({ evaluatedAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate({
+        path: "projectId",
+        select: "repoName repoUrl",
+      });
+
+    const total = await UserSkillModel.countDocuments(query);
+
+    return res.status(200).json({
+      success: true,
+      skills: skills, // Frontend expects `skills` or `data`
+      totalRecords: total,
+      totalPages: Math.ceil(total / limit),
+      page,
+      limit,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch skills",
       error: error.message,
     });
   }

@@ -42,6 +42,11 @@ const projectSchema = new Schema<IProject>(
         of: Number,
         default: {},
       },
+      languagePercentage: {
+        type: Map,
+        of: Number, // Storing as number (e.g. 55.5) so frontend can format as "55.5%" or use in charts if needed
+        default: {},
+      },
     },
 
     // 🔹 Commit Stats

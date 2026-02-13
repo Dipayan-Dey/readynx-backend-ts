@@ -14,7 +14,7 @@ export interface IProject {
   license?: string;
   isFork: boolean;
 
-  // 🔹 Popularity Metrics
+ 
   popularity: {
     stars: number;
     forks: number;
@@ -23,16 +23,17 @@ export interface IProject {
     sizeKB: number;
   };
 
-  // 🔹 Language Intelligence
+  
   languageStats: {
     primaryLanguage: string;
-    languageBreakdown: Record<string, number>; // { JS: 12000, TS: 8000 }
+    languageBreakdown: Record<string, number>; 
+    languagePercentage: Record<string, number>; 
     dominantLanguagePercent: number;
     totalLanguagesUsed: number;
-    multiLanguageScore: number; // 0–100
+    multiLanguageScore: number; 
   };
 
-  // 🔹 Commit Intelligence
+
   commitStats: {
     totalCommits: number;
     totalAdditions: number;
@@ -47,7 +48,7 @@ export interface IProject {
     consistencyScore: number; // 0–100
   };
 
-  // 🔹 Collaboration Signals
+  
   collaborationStats: {
     totalContributors: number;
     userContributionPercent: number;
@@ -59,29 +60,29 @@ export interface IProject {
     issueResolutionRate: number; // %
   };
 
-  // 🔹 Architecture & Professional Signals
+  
   architectureStats: {
     branchCount: number;
     releaseCount: number;
     hasReadme: boolean;
     readmeLength?: number;
     hasLicense: boolean;
-    hasCI: boolean; // detect .github/workflows
+    hasCI: boolean; 
     hasTests: boolean;
-    documentationScore: number; // 0–100
+    documentationScore: number; 
   };
 
-  // 🔹 Activity & Health
+  
   activityStats: {
     repoAgeMonths: number;
     lastActivityDaysAgo: number;
-    activeRatio: number; // activeWeeks / repoAgeWeeks
-    maintenanceScore: number; // 0–100
-    developmentBurstScore: number; // detect irregular bursts
+    activeRatio: number; 
+    maintenanceScore: number; 
+    developmentBurstScore: number; 
   };
 
-  // 🔹 Final Deterministic Metrics
-  healthIndex: number; // 0–100
+ 
+  healthIndex: number; 
   maturityLevel: 1 | 2 | 3 | 4 | 5;
 
   analyzedAt: Date;

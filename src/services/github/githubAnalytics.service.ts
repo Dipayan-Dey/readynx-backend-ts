@@ -1,18 +1,32 @@
 export const generateAnalytics = (raw: any) => {
-  const languages = raw.languages as Record<string, number>;
+  const languages = raw.languages || {};
 
   const totalBytes = Object.values(languages).reduce(
-    (sum: number, value: number) => sum + value,
+    (sum: number, value: any) => sum + (typeof value === "number" ? value : 0),
     0
   );
 
-  const dominantLanguage = Object.keys(raw.languages).reduce((a, b) =>
-    raw.languages[a] > raw.languages[b] ? a : b
-  );
+  let dominantLanguage = "Unknown";
+  let dominantPercent = 0;
+  
+  const languagePercentage: Record<string, number> = {};
 
-  const dominantPercent = totalBytes > 0 
-    ? (raw.languages[dominantLanguage] / totalBytes) * 100 
-    : 0;
+  if (Object.keys(languages).length > 0) {
+     dominantLanguage = Object.keys(languages).reduce((a, b) =>
+      languages[a] > languages[b] ? a : b
+    );
+    
+    dominantPercent = totalBytes > 0 
+      ? (languages[dominantLanguage] / totalBytes) * 100 
+      : 0;
+
+    // Calculate percentages for all languages
+    Object.keys(languages).forEach(lang => {
+      languagePercentage[lang] = totalBytes > 0 
+        ? parseFloat(((languages[lang] / totalBytes) * 100).toFixed(1)) 
+        : 0;
+    });
+  }
 
   // Safe array handling
   const commits = Array.isArray(raw.commits) ? raw.commits : [];
@@ -27,8 +41,9 @@ export const generateAnalytics = (raw: any) => {
   const totalCommits = commits.length;
 
   const activeWeeks = commitActivity.filter((w: any) => w?.total > 0).length;
-  const repoAgeWeeks = commitActivity.length;
-  const consistencyScore = repoAgeWeeks > 0 ? (activeWeeks / repoAgeWeeks) * 100 : 0;
+  // Use map to ensure we process safe values
+  const activityWeeks = commitActivity.length;
+  const consistencyScore = activityWeeks > 0 ? (activeWeeks / activityWeeks) * 100 : 0;
 
   const totalAdditions = codeFrequency.reduce(
     (sum: number, w: any) => sum + (w?.[1] || 0),
@@ -65,7 +80,17 @@ export const generateAnalytics = (raw: any) => {
     if (gap > longestGap) longestGap = gap;
   }
 
-  const commitFrequencyPerWeek = repoAgeWeeks > 0 ? totalCommits / repoAgeWeeks : 0;
+  // Use repo created date for age calculation if commit history is short (due to pagination)
+  // Logic: "repoAgeWeeks" from commitActivity comes from stats endpoint, so it covers full history despite pagination
+  const repoAgeWeeks = commitActivity.length > 0 ? commitActivity.length : 1;
+  
+  const commitFrequencyPerWeek = repoAgeWeeks > 0 ? totalCommits / repoAgeWeeks : 0; // Note: totalCommits is capped at 500 now, so this might be lower than actual entire history. But stats endpoint might give total commits? No, we use `commits.length`. 
+  // BETTER: Use stats total if available? `commitActivity` has weekly totals.
+  const totalCommitsFromStats = commitActivity.reduce((sum: number, w: any) => sum + (w?.total || 0), 0);
+  const effectiveTotalCommits = totalCommitsFromStats > totalCommits ? totalCommitsFromStats : totalCommits;
+  
+  const effectiveCommitFrequency = repoAgeWeeks > 0 ? effectiveTotalCommits / repoAgeWeeks : 0;
+
 
   const codeVolumeScore = Math.min((totalAdditions / 10000) * 100, 100);
 
@@ -93,8 +118,8 @@ export const generateAnalytics = (raw: any) => {
   const hasReadme = raw.repoDetails?.has_readme || false;
   const readmeLength = 0; // Can be calculated if you fetch README content
   const hasLicense = !!raw.repoDetails?.license;
-  const hasCI = false; // Would need to check for .github/workflows or .gitlab-ci.yml
-  const hasTests = false; // Would need to analyze file structure
+  const hasCI = raw.hasCI || false;
+  const hasTests = raw.hasTests || false;
   
   const documentationScore = 
     (hasReadme ? 40 : 0) +
@@ -125,41 +150,75 @@ export const generateAnalytics = (raw: any) => {
   const activeRatio = repoAgeWeeks > 0 ? activeWeeks / repoAgeWeeks : 0;
 
   // Detect development bursts (simplified)
-  const averageCommitsPerWeek = totalCommits / Math.max(repoAgeWeeks, 1);
+  const averageCommitsPerWeek = effectiveTotalCommits / Math.max(repoAgeWeeks, 1);
   const peakWeekCommits = Math.max(...commitActivity.map((w: any) => w?.total || 0), 0);
   const developmentBurstScore = averageCommitsPerWeek > 0 
     ? Math.min((peakWeekCommits / averageCommitsPerWeek) * 20, 100) 
     : 0;
 
+  // Maintenance Score - be more lenient for "finished" projects
   const maintenanceScore = lastActivityDaysAgo < 30 ? 100 : 
-                          lastActivityDaysAgo < 90 ? 70 :
-                          lastActivityDaysAgo < 180 ? 40 : 20;
+                          lastActivityDaysAgo < 90 ? 80 :
+                          lastActivityDaysAgo < 180 ? 60 : 
+                          lastActivityDaysAgo < 365 ? 40 : 20;
 
   // Calculate health index
-  const healthIndex = (
-    consistencyScore * 0.2 +
-    collaborationScore * 0.15 +
-    architectureScore * 0.15 +
-    maintenanceScore * 0.15 +
-    (issueResolutionRate * 100) * 0.15 +
-    (prMergeRate * 100) * 0.1 +
-    documentationScore * 0.1
-  );
+  // Ensure we have numbers
+  const safeConsistency = isNaN(consistencyScore) ? 0 : consistencyScore;
+  const safeCollaboration = isNaN(collaborationScore) ? 0 : collaborationScore;
+  const safeArch = isNaN(architectureScore) ? 0 : architectureScore;
+  const safeMaint = isNaN(maintenanceScore) ? 0 : maintenanceScore;
+  const safeIssueRate = isNaN(issueResolutionRate) ? 0 : issueResolutionRate;
+  const safePrRate = isNaN(prMergeRate) ? 0 : prMergeRate;
+  const safeDoc = isNaN(documentationScore) ? 0 : documentationScore;
+
+  // SOLO DEVELOPER ADJUSTMENT
+  let adjustedCollaboration = safeCollaboration;
+  let adjustedConsistency = safeConsistency;
+  
+  const isSolo = contributors.length === 1;
+  if (isSolo) {
+     // If solo, we care less about PRs/Issues and more about "Did they finish it?"
+     // Boost collaboration score if they have reasonable commits (self-managed)
+     if (effectiveTotalCommits > 10) adjustedCollaboration = 80; 
+     else adjustedCollaboration = 50;
+
+     // Boost consistency if they have a lot of code relative to time (burst of productivity is fine for solo)
+     if (totalAdditions > 1000) adjustedConsistency = Math.max(safeConsistency, 80);
+  }
+
+  // VOLUME BOOSTER
+  // If the project has significant code volume, ensure minimum health
+  let volumeBonus = 0;
+  if (totalAdditions > 10000) volumeBonus = 20;
+  else if (totalAdditions > 2000) volumeBonus = 10;
+
+  const rawHealthIndex = (
+    adjustedConsistency * 0.25 + // Increased weight
+    adjustedCollaboration * 0.10 + // Reduced weight
+    safeArch * 0.15 +
+    safeMaint * 0.15 +
+    safeDoc * 0.15 + 
+    volumeBonus // Add raw volume bonus
+  ) + 20; // Base baseline boost to avoid "18%"
+
+  const healthIndex = Math.min(Math.round(rawHealthIndex), 100);
 
   // Determine maturity level
   let maturityLevel: 1 | 2 | 3 | 4 | 5 = 1;
-  if (totalCommits > 500 && releases.length > 5 && hasCI && hasTests) maturityLevel = 5;
-  else if (totalCommits > 200 && releases.length > 3) maturityLevel = 4;
-  else if (totalCommits > 100 && releases.length > 1) maturityLevel = 3;
-  else if (totalCommits > 50) maturityLevel = 2;
+  // Adjusted thresholds for solo/small projects
+  if (effectiveTotalCommits > 200 || totalAdditions > 50000) maturityLevel = 5;
+  else if (effectiveTotalCommits > 100 || totalAdditions > 20000) maturityLevel = 4;
+  else if (effectiveTotalCommits > 50 || totalAdditions > 5000) maturityLevel = 3;
+  else if (effectiveTotalCommits > 10 || totalAdditions > 1000) maturityLevel = 2;
 
-  const technicalDepthScore =
-    0.25 * dominantPercent +
-    0.2 * codeVolumeScore +
-    0.2 * consistencyScore +
-    0.15 * collaborationScore +
-    0.1 * architectureScore +
-    0.1 * maintenanceScore;
+  // const technicalDepthScore =
+  //   0.25 * dominantPercent +
+  //   0.2 * codeVolumeScore +
+  //   0.2 * consistencyScore +
+  //   0.15 * collaborationScore +
+  //   0.1 * architectureScore +
+  //   0.1 * maintenanceScore;
 
   // Language stats
   const totalLanguagesUsed = Object.keys(languages).length;
@@ -187,6 +246,7 @@ export const generateAnalytics = (raw: any) => {
     languageStats: {
       primaryLanguage: dominantLanguage,
       languageBreakdown: languages,
+      languagePercentage, // ✅ Added percentage map
       dominantLanguagePercent: dominantPercent,
       totalLanguagesUsed,
       multiLanguageScore,
@@ -194,17 +254,17 @@ export const generateAnalytics = (raw: any) => {
 
     // Commit stats
     commitStats: {
-      totalCommits,
+      totalCommits: effectiveTotalCommits, // Use the stats-based total
       totalAdditions,
       totalDeletions,
       totalFilesChanged,
       averageCommitSize,
       firstCommitDate,
       lastCommitDate,
-      commitFrequencyPerWeek,
+      commitFrequencyPerWeek: effectiveCommitFrequency,
       activeWeeks,
       longestInactiveGapDays: Math.round(longestGap),
-      consistencyScore,
+      consistencyScore: safeConsistency,
     },
 
     // Collaboration stats
