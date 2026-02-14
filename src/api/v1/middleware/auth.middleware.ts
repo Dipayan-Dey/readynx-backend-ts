@@ -1,7 +1,7 @@
 // middleware/authMiddleware.ts
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-
+// import jwt from "jsonwebtoken";
+import {verifyToken} from "../../../utils/token.utils";
 interface JwtPayload {
   userId: string;
 }
@@ -23,7 +23,7 @@ export const authMiddleware = (
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const decoded = jwt.verify(token as string, process.env.JWT_SECRET!);
+    const decoded = verifyToken(token as string);
     (req as any).user = decoded;
 
     next();

@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import axios from "axios";
 import ProfileModel from "../../../../models/profile.model";
-const jwt = require('jsonwebtoken');
+// const jwt = require('jsonwebtoken');
+import { verifyToken } from "../../../../utils/token.utils";
 
 /**
  * STEP 1: Redirect user to LinkedIn OAuth
@@ -15,7 +16,7 @@ export const linkedinRedirect = async (req: Request, res: Response) => {
     }
     
     // Verify the token
-    const decoded = jwt.verify(token as string, process.env.JWT_SECRET!);
+    const decoded = verifyToken(token as string);
     
     // Store token in state to retrieve in callback
     const redirectUri = `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/v1/integrations/linkedin/callback`;
@@ -54,7 +55,7 @@ export const linkedinCallback = async (req: Request, res: Response) => {
     }
 
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    const decoded = verifyToken(token as string);
     const userId = (decoded as any).userId;
 
     const redirectUri = `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/v1/integrations/linkedin/callback`;

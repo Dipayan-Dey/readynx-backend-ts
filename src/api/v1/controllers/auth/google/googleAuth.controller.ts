@@ -12,13 +12,15 @@ export const googleAuth = async (req: Request, res: Response) => {
   
 
   const result = await googleLogin(idToken);
-
- const profile= await ProfileModel.create({
-  userId: result.user._id,
-  profileCompleted: false,
-  githubConnected: false,
-  linkedinConnected: false,
-});
+let profile = await ProfileModel.findOne({ userId: result.user._id });
+ if (!profile) {
+  profile= await ProfileModel.create({
+      userId: result.user._id,
+      profileCompleted: false,
+      githubConnected: false,
+      linkedinConnected: false,
+    });
+ }
   res.status(200).json({
     success: true,
     message: `${result.user.name} login successful`,

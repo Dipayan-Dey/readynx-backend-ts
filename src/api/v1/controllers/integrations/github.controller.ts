@@ -1,7 +1,8 @@
 // controllers/integrations.controller.ts
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
+// import jwt from "jsonwebtoken";
 import ProfileModel from "../../../../models/profile.model";
+import { verifyToken } from "../../../../utils/token.utils";
 export const  githubRedirect = async (req: Request, res: Response) => {
   try {
     const { token } = req.query;
@@ -15,7 +16,7 @@ export const  githubRedirect = async (req: Request, res: Response) => {
     
     // Verify the token
     try {
-      const decoded = jwt.verify(token as string, process.env.JWT_SECRET!);
+      const decoded = verifyToken(token as string);
       const userId = (decoded as any).userId;
       
       // Store token in state to retrieve in callback
@@ -56,7 +57,7 @@ export const githubCallback = async (req: Request, res: Response) => {
     }
     
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    const decoded = verifyToken(token as string);
     const userId = (decoded as any).userId;
     
     // Exchange code for GitHub access token
