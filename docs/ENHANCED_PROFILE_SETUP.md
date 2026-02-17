@@ -9,12 +9,14 @@ This document provides setup instructions for the enhanced profile system that a
 The following npm packages have been installed:
 
 ### Production Dependencies
+
 - `multer` (^2.0.2) - Middleware for handling multipart/form-data (file uploads)
 - `pdf-parse` (^2.4.5) - Library for extracting text from PDF files
 - `mammoth` (^1.11.0) - Library for extracting text from DOCX files
 - `groq-sdk` (^0.37.0) - SDK for integrating with Groq API (LLaMA model)
 
 ### Development Dependencies
+
 - `@types/multer` (^2.0.0) - TypeScript type definitions for multer
 - `@types/pdf-parse` (^1.1.5) - TypeScript type definitions for pdf-parse
 
@@ -23,6 +25,7 @@ The following npm packages have been installed:
 The following environment variables are required and have been configured in `.env`:
 
 ### Cloudinary Configuration
+
 ```env
 CLOUD_NAME=dlsuycdfj
 CLOUD_API_KEY=433334597632452
@@ -32,8 +35,9 @@ CLOUD_API_SECRET=AiPcrumE-_TBS2MP0ppDOGXIlyE
 **Note:** The Cloudinary variable names have been corrected from `COULD_*` to `CLOUD_*`.
 
 ### Groq API Configuration
+
 ```env
-GROQ_API_KEY=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
+GROQ_API_KEY=
 ```
 
 ## TypeScript Types Created
@@ -41,19 +45,23 @@ GROQ_API_KEY=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
 The following TypeScript interfaces have been created in `src/@types/interfaces/`:
 
 ### 1. Resume Analysis Interface (`resumeAnalysis.interface.ts`)
+
 - `IResumeAnalysis` - Structure for AI-generated resume analysis results
 - `IProfileWithAnalysis` - Extension for profile with analysis timestamps
 
 ### 2. Interview Session Interface (`interviewSession.interface.ts`)
+
 - `IInterviewQuestion` - Structure for interview questions and answers
 - `IPerformanceMetrics` - Structure for interview performance metrics
 - `IInterviewSession` - Complete interview session document
 
 ### 3. Quiz Session Interface (`quizSession.interface.ts`)
+
 - `IQuizQuestion` - Structure for quiz questions with multiple choice options
 - `IQuizSession` - Complete quiz session document
 
 ### 4. Services Interface (`services.interface.ts`)
+
 - Cloudinary service types
 - Resume service types
 - Groq API service types
@@ -62,7 +70,9 @@ The following TypeScript interfaces have been created in `src/@types/interfaces/
 - Profile service types
 
 ### 5. Updated Profile Interface
+
 The existing `profile.interfaces.ts` has been extended with:
+
 - `resumeUploadedAt` - Timestamp for resume upload
 - `resumeAnalysis` - Embedded resume analysis results
 - `resumeAnalyzedAt` - Timestamp for analysis completion
@@ -72,6 +82,7 @@ The existing `profile.interfaces.ts` has been extended with:
 ## Configuration Files Created
 
 ### 1. Groq API Configuration (`src/config/groq.ts`)
+
 Initializes the Groq SDK client with the API key from environment variables.
 
 ```typescript
@@ -85,6 +96,7 @@ export default groqClient;
 ```
 
 ### 2. Cloudinary Configuration (Already Exists)
+
 Located at `src/config/cloudinary.ts` - already properly configured with environment variables.
 
 ## Project Structure
@@ -127,11 +139,13 @@ With the dependencies and configuration complete, the next tasks are:
 To verify the setup is complete:
 
 1. Check that all packages are installed:
+
    ```bash
    npm list multer pdf-parse mammoth groq-sdk
    ```
 
 2. Verify environment variables are set:
+
    ```bash
    # Check .env file contains:
    # - CLOUD_NAME, CLOUD_API_KEY, CLOUD_API_SECRET
@@ -153,6 +167,7 @@ To verify the setup is complete:
 ## Support
 
 For issues or questions about the setup, refer to:
+
 - Groq SDK Documentation: https://github.com/groq/groq-sdk-js
 - Cloudinary Documentation: https://cloudinary.com/documentation
 - Multer Documentation: https://github.com/expressjs/multer
