@@ -4,9 +4,6 @@ import ProfileModel from "../../../../models/profile.model";
 // const jwt = require('jsonwebtoken');
 import { verifyToken } from "../../../../utils/token.utils";
 
-/**
- * STEP 1: Redirect user to LinkedIn OAuth
- */
 export const linkedinRedirect = async (req: Request, res: Response) => {
   try {
     const { token } = req.query;
@@ -37,9 +34,7 @@ export const linkedinRedirect = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * STEP 2: LinkedIn OAuth Callback
- */
+
 export const linkedinCallback = async (req: Request, res: Response) => {
   try {
     const { code, state, error } = req.query;
@@ -113,10 +108,7 @@ export const linkedinCallback = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * STEP 3: Post to LinkedIn
- * POST /integrations/linkedin/post
- */
+
 export const linkedinPost = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId;

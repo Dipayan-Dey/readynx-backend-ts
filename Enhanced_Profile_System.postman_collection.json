@@ -1,0 +1,631 @@
+{
+  "info": {
+    "name": "Enhanced Profile System API",
+    "description": "Complete API collection for testing Resume, Analysis, Profile, Interview, and Quiz endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "quizSessionId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('token', response.data.token);",
+                  "    console.log('Token saved:', response.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Sign Up",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('token', response.data.token);",
+                  "    console.log('Token saved:', response.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/signup",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "signup"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Resume Management",
+      "item": [
+        {
+          "name": "Upload Resume",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "resume",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile/resume/upload",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile", "resume", "upload"]
+            }
+          }
+        },
+        {
+          "name": "Get Resume",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile/resume",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile", "resume"]
+            }
+          }
+        },
+        {
+          "name": "Delete Resume",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile/resume",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile", "resume"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Resume Analysis",
+      "item": [
+        {
+          "name": "Analyze Resume",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile/resume/analyze",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile", "resume", "analyze"]
+            }
+          }
+        },
+        {
+          "name": "Get Analysis Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile/resume/analysis",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile", "resume", "analysis"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Profile Management",
+      "item": [
+        {
+          "name": "Get Complete Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Update Personal Info",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"email\": \"updated@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile/personal",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile", "personal"]
+            }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bio\": \"Passionate full-stack developer\",\n  \"location\": \"San Francisco, CA\",\n  \"targetRole\": \"Senior Full-Stack Developer\",\n  \"experienceLevel\": \"intermediate\",\n  \"skills\": [\"JavaScript\", \"TypeScript\", \"React\", \"Node.js\", \"MongoDB\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Update Settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"targetRole\": \"Senior Full-Stack Developer\",\n  \"experienceLevel\": \"advanced\",\n  \"privacySettings\": {\n    \"showEmail\": false,\n    \"showPhone\": false,\n    \"showResume\": true,\n    \"showProjects\": true\n  },\n  \"notificationPreferences\": {\n    \"emailNotifications\": true,\n    \"quizReminders\": true,\n    \"interviewReminders\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile/settings",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile", "settings"]
+            }
+          }
+        },
+        {
+          "name": "Disconnect LinkedIn",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile/disconnect/linkedin",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile", "disconnect", "linkedin"]
+            }
+          }
+        },
+        {
+          "name": "Disconnect GitHub",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/profile/disconnect/github",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "profile", "disconnect", "github"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Interview",
+      "item": [
+        {
+          "name": "Start Interview",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('sessionId', response.data.sessionId);",
+                  "    console.log('Session ID saved:', response.data.sessionId);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"targetRole\": \"Full-Stack Developer\",\n  \"experienceLevel\": \"intermediate\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/interviews/start",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "interviews", "start"]
+            }
+          }
+        },
+        {
+          "name": "Submit Answer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionIndex\": 0,\n  \"answer\": \"REST APIs use HTTP methods and endpoints for CRUD operations, while GraphQL uses a single endpoint with a query language. GraphQL allows clients to request exactly the data they need, reducing over-fetching and under-fetching issues.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/interviews/{{sessionId}}/answer",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "interviews", "{{sessionId}}", "answer"]
+            }
+          }
+        },
+        {
+          "name": "Complete Interview",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/interviews/{{sessionId}}/complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "interviews", "{{sessionId}}", "complete"]
+            }
+          }
+        },
+        {
+          "name": "Get Interview History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/interviews/history?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "interviews", "history"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Interview Session",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/interviews/{{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "interviews", "{{sessionId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Quiz",
+      "item": [
+        {
+          "name": "Generate Quiz",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"targetRole\": \"Full-Stack Developer\",\n  \"questionCount\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quizzes/generate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quizzes", "generate"]
+            }
+          }
+        },
+        {
+          "name": "Start Quiz",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('quizSessionId', response.data.sessionId);",
+                  "    console.log('Quiz Session ID saved:', response.data.sessionId);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"targetRole\": \"Full-Stack Developer\",\n  \"questionCount\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quizzes/start",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quizzes", "start"]
+            }
+          }
+        },
+        {
+          "name": "Submit Quiz Answers",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": [\n    { \"questionIndex\": 0, \"answer\": \"A\" },\n    { \"questionIndex\": 1, \"answer\": \"C\" },\n    { \"questionIndex\": 2, \"answer\": \"B\" },\n    { \"questionIndex\": 3, \"answer\": \"D\" },\n    { \"questionIndex\": 4, \"answer\": \"A\" }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quizzes/{{quizSessionId}}/submit",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quizzes", "{{quizSessionId}}", "submit"]
+            }
+          }
+        },
+        {
+          "name": "Get Quiz History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quizzes/history?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quizzes", "history"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Chatbot",
+      "item": [
+        {
+          "name": "Send Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"What are my strongest skills based on my profile?\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/chatbot/message",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "chatbot", "message"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

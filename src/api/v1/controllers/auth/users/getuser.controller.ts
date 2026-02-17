@@ -25,12 +25,12 @@ export const getMyProfile = async (req: AuthRequest, res: Response) => {
 
     const combinedResult = {
       ...profile.toObject(),
-      user: user ? user.toObject() : null,
+      user: user ,
     };
 
     res.status(200).json({
       message: "Profile fetched successfully",
-      data: combinedResult,
+      data: user,
     });
   } catch (error) {
     res.status(500).json({

@@ -2,11 +2,7 @@ import express from "express";
 import cors from "cors";
 
 import cookieParser from "cookie-parser";
-import authrouter from "./api/v1/routes/auth.route";
-
-import userrouter from "./api/v1/routes/user.route";
-import integrationrouter from "./api/v1/routes/integrations.routes";
-import githubrouter from "./api/v1/routes/github.routes";
+import v1Router from "./api/v1";
 // import githubrouter from "./api/v1/routes/integrations.routes";
 // import connectDB from "./config/db";
 const app = express();
@@ -32,12 +28,6 @@ app.get("/", (_, res) => {
     res.send("API is running...");
 });
 
-app.use("/api/v1/auth",authrouter);
-
-app.use("/api/v1/user",userrouter);
-
-app.use("/api/v1/integrations", integrationrouter);
-
-app.use("/api/v1/integrations/github", githubrouter);
+app.use("/api/v1",v1Router)
 // connectDB();
 export default app;

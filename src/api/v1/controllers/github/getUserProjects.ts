@@ -6,7 +6,7 @@ export const getUserProjects = async (req: Request, res: Response) => {
 
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
-    const search = (req.query.search as string) || ""; // ✅ Added search
+    const search = (req.query.search as string) || ""; 
     const skip = (page - 1) * limit;
 
     const query: any = { userId };
@@ -18,15 +18,14 @@ export const getUserProjects = async (req: Request, res: Response) => {
       .sort({ createdAt: -1 })
       .skip(skip) 
       .limit(limit);
-      // .select("repoName repoUrl repoFullName createdAt"); // Removed select to return all stats for current display
-
+      
     const total = await ProjectModel.countDocuments(query);
 
     return res.status(200).json({
       success: true,
       data: projects,
-      totalRecords: total, // ✅ Matches frontend
-      totalPages: Math.ceil(total / limit), // ✅ Matches frontend
+      totalRecords: total, 
+      totalPages: Math.ceil(total / limit), 
       page,
       limit,
     });

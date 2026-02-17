@@ -2,10 +2,7 @@ import { Request, Response } from "express";
 import axios from "axios";
 import ProfileModel from "../../../../models/profile.model";
 
-/**
- * Post to LinkedIn
- * POST /integrations/linkedin/post
- */
+
 export const linkedinPost = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.userId;
@@ -18,7 +15,7 @@ export const linkedinPost = async (req: Request, res: Response) => {
       });
     }
 
-    // Get user's LinkedIn access token
+ 
     const profile = await ProfileModel.findOne({ userId });
 
     if (!profile || !profile.linkedinConnected || !profile.linkedinAccessToken) {
@@ -28,7 +25,7 @@ export const linkedinPost = async (req: Request, res: Response) => {
       });
     }
 
-    // Get LinkedIn user ID (sub)
+ 
     const userInfoResponse = await axios.get(
       "https://api.linkedin.com/v2/userinfo",
       {
@@ -40,7 +37,7 @@ export const linkedinPost = async (req: Request, res: Response) => {
 
     const linkedinUserId = userInfoResponse.data.sub;
 
-    // Create LinkedIn post using UGC API
+ 
     const postData = {
       author: `urn:li:person:${linkedinUserId}`,
       lifecycleState: "PUBLISHED",
