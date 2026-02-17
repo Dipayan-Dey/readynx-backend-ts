@@ -15,19 +15,19 @@ app.use(
       "http://localhost:5173",
       "http://127.0.0.1:3000",
       "https://readynx.netlify.app",
+      "https://readynx.dipayandey.site",
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
-  })
+  }),
 );
 app.use(cookieParser());
 
-
 app.get("/", (_, res) => {
-    res.send("API is running...");
+  res.send("API is running...");
 });
 
-app.use("/api/v1",v1Router)
+app.use("/api/v1", v1Router);
 // connectDB();
 export default app;
