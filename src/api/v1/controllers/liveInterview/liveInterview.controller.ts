@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
+import crypto from "crypto";
 import resumeAnalysisService from "../../../../services/resumeAnalysis.service";
 import { generateInterviewQuestionsFromAnalysis } from "../../../../services/liveInterview/liveInterviewGenerator.service";
 import {
@@ -9,6 +10,7 @@ import {
 } from "../../../../services/liveInterview/liveInterview.service";
 import { evaluateAnswerWithContext } from "../../../../services/liveInterview/answerEvaluator.service";
 import { generateFinalReport } from "../../../../services/liveInterview/reportGenerator.service";
+import ttsService from "../../../../services/integrations/tts.service";
 
 export const startInterview = async (req: Request, res: Response) => {
   try {
@@ -37,13 +39,40 @@ export const startInterview = async (req: Request, res: Response) => {
       });
     }
 
+    // Validate that all questions are strings
+    const validQuestions = questionResponse.questions
+      .map((q: any) => {
+        if (typeof q === "string") return q.trim();
+        if (
+          typeof q === "object" &&
+          q !== null &&
+          q.question &&
+          typeof q.question === "string"
+        ) {
+          return q.question.trim();
+        }
+        return "";
+      })
+      .filter((q: string) => q.length > 0);
+
+    if (validQuestions.length === 0) {
+      console.error(
+        "[Start Interview] No valid string questions found:",
+        questionResponse.questions,
+      );
+      return res.status(500).json({
+        success: false,
+        message: "Failed to generate valid interview questions",
+      });
+    }
+
     const sessionId = uuidv4();
 
     createInterviewSession(
       sessionId,
       userId.toString(), // ensure string
       analysis,
-      questionResponse.questions,
+      validQuestions,
     );
 
     return res.status(200).json({
@@ -51,8 +80,8 @@ export const startInterview = async (req: Request, res: Response) => {
       data: {
         // Wrapped in data to match frontend expectation
         sessionId,
-        questions: questionResponse.questions,
-        firstQuestion: questionResponse.questions[0],
+        questions: validQuestions,
+        firstQuestion: validQuestions[0],
       },
     });
   } catch (error: any) {
@@ -222,6 +251,114 @@ export const getSessionDetails = async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       message: "Failed to fetch session details",
+    });
+  }
+};
+
+export const getQuestionAudio = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.userId;
+    const rawSessionId = req.params.sessionId;
+    const rawQuestionIndex = req.params.questionIndex;
+
+    if (
+      !rawSessionId ||
+      Array.isArray(rawSessionId) ||
+      !rawQuestionIndex ||
+      Array.isArray(rawQuestionIndex)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Session ID and question index are required",
+      });
+    }
+
+    const sessionId: string = rawSessionId;
+    const questionIndex: string = rawQuestionIndex;
+
+    const session = getInterviewSession(sessionId);
+
+    if (!session) {
+      return res.status(404).json({
+        success: false,
+        message: "Interview session not found",
+      });
+    }
+
+    // Verify user owns this session
+    if (session.userId.toString() !== userId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized access to session",
+      });
+    }
+
+    const index = parseInt(questionIndex, 10);
+
+    if (isNaN(index) || index < 0 || index >= session.questions.length) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid question index",
+      });
+    }
+
+    const questionText = session.questions[index];
+
+    // Validate question text is a string
+    if (!questionText || typeof questionText !== "string") {
+      console.error(
+        "[Controller] Invalid question text at index",
+        index,
+        ":",
+        typeof questionText,
+        questionText,
+      );
+      return res.status(500).json({
+        success: false,
+        message: "Invalid question data",
+      });
+    }
+
+    // Check if TTS service is available
+    const isAvailable = await ttsService.isAvailable();
+    if (!isAvailable) {
+      return res.status(503).json({
+        success: false,
+        message:
+          "Text-to-speech service is not available. Please use client-side TTS.",
+        fallback: true,
+      });
+    }
+
+    // Generate ETag for caching (hash of sessionId + questionIndex)
+    const etag = crypto
+      .createHash("md5")
+      .update(`${sessionId}-${questionIndex}`)
+      .digest("hex");
+
+    // Check if client has cached version BEFORE generating audio
+    const clientETag = req.headers["if-none-match"];
+    if (clientETag === etag) {
+      return res.status(304).end(); // Not Modified - skip audio generation
+    }
+
+    // Generate audio only if not cached
+    const audioBuffer = await ttsService.generateSpeech(questionText);
+
+    // Set appropriate headers for audio streaming
+    res.setHeader("Content-Type", "audio/mpeg");
+    res.setHeader("Content-Length", audioBuffer.length.toString());
+    res.setHeader("Cache-Control", "public, max-age=3600, immutable"); // Cache for 1 hour, immutable since questions don't change
+    res.setHeader("ETag", etag);
+    res.setHeader("Accept-Ranges", "bytes"); // Enable range requests for seeking
+    res.setHeader("Content-Disposition", "inline; filename=question.mp3"); // Suggest inline playback
+
+    return res.send(audioBuffer);
+  } catch (error: any) {
+    console.error("Get Question Audio Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to generate question audio",
     });
   }
 };

@@ -2,7 +2,8 @@ import { Types } from "mongoose";
 import ProfileModel from "../models/profile.model";
 import { IProfile } from "../@types/interfaces/profile.interfaces";
 import { IResumeAnalysis } from "../@types/interfaces/resumeAnalysis.interface";
-import { analyzeResumeWithAI } from "./integrations/gemini.service";
+import { analyzeResumeWithAI } from "./integrations/groq.service";
+// import { analyzeResumeWithAI } from "./integrations/gemini.service";
 
 export class ResumeAnalysisService {
   async analyzeResume(userId: Types.ObjectId): Promise<IResumeAnalysis> {

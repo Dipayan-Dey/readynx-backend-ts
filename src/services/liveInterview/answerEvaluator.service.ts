@@ -1,17 +1,19 @@
-import { geminiModel } from "../../config/gemini";
 import { cleanJson } from "../../utils/jsonUtils";
-
+import { makeGroqChatCompletion } from "../integrations/groq.service";
 export const evaluateAnswerWithContext = async (
   question: string,
   answer: string,
   analysis: any,
 ) => {
-  const prompt = `
-You are conducting a live technical interview.
+  const systemMessage = `
+You are a senior technical interviewer conducting a live technical interview.
+Be strict but fair. Return ONLY valid JSON.
+`;
 
-Candidate Skills: ${analysis.skills.join(", ")}
-Strengths: ${analysis.strengths.join(", ")}
-Weaknesses: ${analysis.weaknesses.join(", ")}
+  const prompt = `
+Candidate Skills: ${analysis.skills?.join(", ") || ""}
+Strengths: ${analysis.strengths?.join(", ") || ""}
+Weaknesses: ${analysis.weaknesses?.join(", ") || ""}
 
 Question:
 ${question}
@@ -32,9 +34,7 @@ Return JSON:
 }
 `;
 
-  const result = await geminiModel.generateContent(prompt);
-  const response = await result.response;
-  const text = response.text();
+  const text = await makeGroqChatCompletion(prompt, systemMessage);
 
   return cleanJson(text);
 };

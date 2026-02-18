@@ -7,10 +7,11 @@ import {
   IInterviewQuestion,
   IPerformanceMetrics,
 } from "../@types/interfaces/interviewSession.interface";
-import {
-  generateInterviewQuestions,
-  evaluateInterviewAnswer,
-} from "./integrations/gemini.service";
+import { evaluateInterviewAnswer, generateInterviewQuestions } from "./integrations/groq.service";
+// import {
+//   generateInterviewQuestions,
+//   evaluateInterviewAnswer,
+// } from "./integrations/gemini.service";
 
 export class InterviewService {
   async startInterviewSession(

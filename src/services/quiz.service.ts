@@ -6,7 +6,8 @@ import {
   IQuizSession,
   IQuizQuestion,
 } from "../@types/interfaces/quizSession.interface";
-import { generateTechnicalQuiz } from "./integrations/gemini.service";
+import { generateTechnicalQuiz } from "./integrations/groq.service";
+// import { generateTechnicalQuiz } from "./integrations/gemini.service";
 
 export class QuizService {
   async generateQuiz(

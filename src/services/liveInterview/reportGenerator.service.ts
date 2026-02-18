@@ -1,9 +1,11 @@
-// import { geminiModel } from "../config/gemini";
-
-import { geminiModel } from "../../config/gemini";
 import { cleanJson } from "../../utils/jsonUtils";
-
+import { makeGroqChatCompletion } from "../integrations/groq.service";
 export async function generateFinalReport(transcript: any[]) {
+  const systemMessage = `
+You are an expert technical interviewer and career coach.
+Return ONLY valid JSON.
+`;
+
   const prompt = `
 Based on this full interview transcript:
 
@@ -21,9 +23,7 @@ Generate:
 }
 `;
 
-  const result = await geminiModel.generateContent(prompt);
-  const response = await result.response;
-  const text = response.text();
+  const text = await makeGroqChatCompletion(prompt, systemMessage);
 
   return cleanJson(text);
 }

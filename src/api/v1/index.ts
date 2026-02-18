@@ -10,8 +10,7 @@ import quizRouter from "./routes/quiz.routes";
 import profileRouter from "./routes/profile.routes";
 import chatbotRouter from "./routes/chatbot.routes";
 import liveInterviewRoute from "./routes/liveInterview.route";
-
-// import liveInterviewRoute from "./routes/liveInterview.route";
+import mindmapRouter from "./routes/mindmap.routes";
 
 const v1Router = Router();
 
@@ -26,5 +25,6 @@ v1Router.use("/quizzes", quizRouter);
 v1Router.use("/profile", profileRouter);
 v1Router.use("/chatbot", chatbotRouter);
 v1Router.use("/live-interview", liveInterviewRoute);
+v1Router.use("/carrermap", mindmapRouter);
 
 export default v1Router;

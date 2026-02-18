@@ -1,5 +1,6 @@
 import { Types } from "mongoose";
-import { geminiModel } from "../config/gemini";
+// import { geminiModel } from "../config/gemini";
+import { makeGroqChatCompletion } from "./integrations/groq.service";
 import ProfileModel from "../models/profile.model";
 import ProjectModel from "../models/project.model";
 import UserModel from "../models/user.model";
@@ -115,9 +116,9 @@ Now respond to the user's message in a helpful and personalized way.`;
       const fullPrompt = `${systemPrompt}\n\nUser Message: ${userMessage}\n\nYour Response:`;
 
       // Generate response using Gemini
-      const result = await geminiModel.generateContent(fullPrompt);
-      const response = result.response;
-      const text = response.text();
+      const text = await makeGroqChatCompletion(fullPrompt,systemPrompt);
+      // const response = result.response;
+      // const text = response.text();
 
       return text;
     } catch (error) {

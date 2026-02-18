@@ -1,19 +1,19 @@
-// import { geminiModel } from "../config/gemini";
-
-import { geminiModel } from "../../config/gemini";
 import { cleanJson } from "../../utils/jsonUtils";
-
-// import { cleanJson } from "../../utils/jsonUtils";
+import { makeGroqChatCompletion } from "../integrations/groq.service";
 
 export const generateInterviewQuestionsFromAnalysis = async (analysis: any) => {
-  const prompt = `
+  const systemMessage = `
 You are a senior technical interviewer.
+Generate structured, practical, non-generic interview questions.
+Return ONLY valid JSON.
+`;
 
+  const prompt = `
 Candidate Profile:
 ATS Score: ${analysis.atsScore}
-Skills: ${analysis.skills.join(", ")}
-Strengths: ${analysis.strengths.join(", ")}
-Weaknesses: ${analysis.weaknesses.join(", ")}
+Skills: ${analysis.skills?.join(", ") || ""}
+Strengths: ${analysis.strengths?.join(", ") || ""}
+Weaknesses: ${analysis.weaknesses?.join(", ") || ""}
 Experience Summary: ${analysis.experienceSummary}
 
 Generate 10 interview questions:
@@ -33,9 +33,7 @@ Return ONLY JSON format:
 }
 `;
 
-  const result = await geminiModel.generateContent(prompt);
-  const response = await result.response;
-  const text = response.text();
+  const text = await makeGroqChatCompletion(prompt, systemMessage);
 
   return cleanJson(text);
 };
