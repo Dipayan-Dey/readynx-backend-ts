@@ -9,6 +9,9 @@ import interviewRouter from "./routes/interview.routes";
 import quizRouter from "./routes/quiz.routes";
 import profileRouter from "./routes/profile.routes";
 import chatbotRouter from "./routes/chatbot.routes";
+import liveInterviewRoute from "./routes/liveInterview.route";
+
+// import liveInterviewRoute from "./routes/liveInterview.route";
 
 const v1Router = Router();
 
@@ -22,5 +25,6 @@ v1Router.use("/interviews", interviewRouter);
 v1Router.use("/quizzes", quizRouter);
 v1Router.use("/profile", profileRouter);
 v1Router.use("/chatbot", chatbotRouter);
+v1Router.use("/live-interview", liveInterviewRoute);
 
 export default v1Router;
