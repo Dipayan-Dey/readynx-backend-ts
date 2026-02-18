@@ -19,18 +19,48 @@ export const getMyProfile = async (req: AuthRequest, res: Response) => {
     const profile = await ProfileModel.findOne({ userId });
     const user = await UserModel.findById(userId);
 
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     if (!profile) {
       return res.status(404).json({ message: "Profile not found" });
     }
 
-    const combinedResult = {
-      ...profile.toObject(),
-      user: user ,
+    const responseData = {
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        isEmailVerified: user.isEmailVerified,
+      },
+      profile: {
+        targetRole: profile.targetRole,
+        experienceLevel: profile.experienceLevel,
+        bio: profile.bio,
+        location: profile.location,
+        website: profile.website,
+        phone: profile.phone,
+        skills: profile.skills,
+        resumeUrl: profile.resumeUrl,
+        profileCompleted: profile.profileCompleted,
+      },
+      connections: {
+        github: {
+          connected: profile.githubConnected,
+          username: profile.githubUsername || null,
+        },
+        linkedin: {
+          connected: profile.linkedinConnected,
+          linkedinId: profile.linkedinId || null,
+        },
+      },
     };
 
     res.status(200).json({
       message: "Profile fetched successfully",
-      data: user,
+      data: responseData,
     });
   } catch (error) {
     res.status(500).json({
@@ -39,5 +69,3 @@ export const getMyProfile = async (req: AuthRequest, res: Response) => {
     });
   }
 };
-
-

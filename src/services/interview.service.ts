@@ -40,7 +40,7 @@ export class InterviewService {
 
       const questionsResponse = await generateInterviewQuestions(
         profile?.resumeText || undefined,
-        githubProjects,
+        // githubProjects,
         finalTargetRole,
         finalExperienceLevel,
       );

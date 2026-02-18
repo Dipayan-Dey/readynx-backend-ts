@@ -115,7 +115,9 @@ export class ProfileService {
           : null,
         connections: {
           linkedinConnected: profile.linkedinConnected || false,
+          linkedinId: profile.linkedinId || null,
           githubConnected: profile.githubConnected || false,
+          githubUsername: profile.githubUsername || null,
         },
         stats: {
           interviewCount,

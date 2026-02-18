@@ -180,12 +180,12 @@ Return ONLY the JSON object, no additional text.`;
 
 export const generateInterviewQuestions = async (
   resumeText?: string,
-  githubProjects?: Array<{
-    repoName: string;
-    description?: string;
-    primaryLanguage: string;
-    topics: string[];
-  }>,
+  // githubProjects?: Array<{
+  //   repoName: string;
+  //   description?: string;
+  //   primaryLanguage: string;
+  //   topics: string[];
+  // }>,
   targetRole?: string,
   experienceLevel?: string,
 ): Promise<IGeminiInterviewQuestionsResponse> => {
@@ -203,21 +203,21 @@ export const generateInterviewQuestions = async (
     contextParts.push(`\nResume Content:\n${resumeText.substring(0, 3000)}`);
   }
 
-  if (githubProjects && githubProjects.length > 0) {
-    const projectsSummary = githubProjects
-      .map((project) => {
-        const parts = [
-          `- ${project.repoName}`,
-          project.description ? `: ${project.description}` : "",
-          project.primaryLanguage ? ` (${project.primaryLanguage})` : "",
-          project.topics.length > 0 ? ` [${project.topics.join(", ")}]` : "",
-        ];
-        return parts.join("");
-      })
-      .join("\n");
+  // if (githubProjects && githubProjects.length > 0) {
+  //   const projectsSummary = githubProjects
+  //     .map((project) => {
+  //       const parts = [
+  //         `- ${project.repoName}`,
+  //         project.description ? `: ${project.description}` : "",
+  //         project.primaryLanguage ? ` (${project.primaryLanguage})` : "",
+  //         project.topics.length > 0 ? ` [${project.topics.join(", ")}]` : "",
+  //       ];
+  //       return parts.join("");
+  //     })
+  //     .join("\n");
 
-    contextParts.push(`\nGitHub Projects:\n${projectsSummary}`);
-  }
+  //   contextParts.push(`\nGitHub Projects:\n${projectsSummary}`);
+  // }
 
   if (contextParts.length === 0) {
     throw new Error(
@@ -266,6 +266,7 @@ Return ONLY the JSON object, no additional text.`;
     );
   }, "Interview Question Generation");
 };
+
 
 export const evaluateInterviewAnswer = async (
   question: string,

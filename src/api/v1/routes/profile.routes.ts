@@ -45,10 +45,6 @@ profileRouter.put(
   updateSettings
 );
 
-// POST /api/v1/profile/disconnect/linkedin - Disconnect LinkedIn account
-// profileRouter.post("/disconnect/linkedin", authMiddleware, disconnectLinkedIn);
 
-// // POST /api/v1/profile/disconnect/github - Disconnect GitHub account
-// profileRouter.post("/disconnect/github", authMiddleware, disconnectGitHub);
 
 export default profileRouter;
