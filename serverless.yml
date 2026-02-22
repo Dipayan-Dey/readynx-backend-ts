@@ -1,0 +1,70 @@
+service: readynx-backend
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-south-1
+  stage: ${opt:stage, 'prod'}
+  timeout: 30
+  memorySize: 1024
+  environment:
+    NODE_ENV: production
+    MONGO_URI: ${env:MONGO_URI}
+    JWT_SECRET: ${env:JWT_SECRET}
+    PORT: ${env:PORT, '5000'}
+    GOOGLE_CLIENT_ID: ${env:GOOGLE_CLIENT_ID}
+    GROQ_API_KEY: ${env:GROQ_API_KEY}
+    CLOUD_NAME: ${env:CLOUD_NAME}
+    CLOUD_API_KEY: ${env:CLOUD_API_KEY}
+    CLOUD_API_SECRET: ${env:CLOUD_API_SECRET}
+    CLIENT_ID_GITHUB: ${env:CLIENT_ID_GITHUB}
+    CLIENT_SECRET_GITHUB: ${env:CLIENT_SECRET_GITHUB}
+    REDIRECT_URI_GITHUB: ${env:REDIRECT_URI_GITHUB}
+    LINKEDIN_CLIENT_ID: ${env:LINKEDIN_CLIENT_ID}
+    LINKEDIN_CLIENT_SECRET: ${env:LINKEDIN_CLIENT_SECRET}
+    LINKEDIN_REDIRECT_URI: ${env:LINKEDIN_REDIRECT_URI}
+    FRONTEND_URL: ${env:FRONTEND_URL}
+    BACKEND_URL: ${env:BACKEND_URL}
+
+package:
+  individually: false
+  excludeDevDependencies: true
+  patterns:
+    - dist/**
+    - node_modules/**
+    - package.json
+    - package-lock.json
+    - "!src/**"
+    - "!**/*.ts"
+    - "!.git/**"
+    - "!.env"
+    - "!.env.*"
+    - "!tests/**"
+    - "!*.md"
+    - "!.gitignore"
+    - "!.dockerignore"
+    - "!docker-compose.yml"
+    - "!Dockerfile"
+
+functions:
+  api:
+    handler: dist/index.handler
+    events:
+      - httpApi:
+          path: /{proxy+}
+          method: ANY
+      - httpApi:
+          path: /
+          method: ANY
+    vpc:
+      securityGroupIds: []
+      subnetIds: []
+
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 5000
+    noPrependStageInUrl: true
