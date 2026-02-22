@@ -62,8 +62,7 @@ Look for these messages in Render logs:
 [Cloudinary Config] Configuration complete
 ```
 
-
-```
+````
 
 ### 5. Test Resume Upload
 
@@ -74,7 +73,7 @@ Content-Type: multipart/form-data
 
 Body:
 - resume: [your-file.pdf]
-```
+````
 
 ## If Still Not Working
 
@@ -118,8 +117,8 @@ CLOUD_API_SECRET=AiPcrumE-_TBS2MP0ppDOGXIlyE
 GROQ_API_KEY=your_groq_key
 GEMINI_API_KEY=your_gemini_key
 GOOGLE_CLIENT_ID=your_google_client_id
-GITHUB_CLIENT_ID=your_github_client_id
-GITHUB_CLIENT_SECRET=your_github_secret
+CLIENT_ID_GITHUB=your_CLIENT_ID_GITHUB
+CLIENT_SECRET_GITHUB=your_github_secret
 LINKEDIN_CLIENT_ID=your_linkedin_client_id
 LINKEDIN_CLIENT_SECRET=your_linkedin_secret
 

@@ -94,9 +94,9 @@ CLOUD_API_KEY=your_cloudinary_api_key
 CLOUD_API_SECRET=your_cloudinary_api_secret
 
 # GitHub OAuth (optional)
-GITHUB_CLIENT_ID=your_github_client_id
-GITHUB_CLIENT_SECRET=your_github_client_secret
-GITHUB_REDIRECT_URI=http://localhost:5000/api/oauth/github/callback
+CLIENT_ID_GITHUB=your_CLIENT_ID_GITHUB
+CLIENT_SECRET_GITHUB=your_CLIENT_SECRET_GITHUB
+REDIRECT_URI_GITHUB=http://localhost:5000/api/oauth/github/callback
 
 # LinkedIn OAuth (optional)
 LINKEDIN_CLIENT_ID=your_linkedin_client_id

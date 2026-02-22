@@ -3,28 +3,28 @@ import { Request, Response } from "express";
 // import jwt from "jsonwebtoken";
 import ProfileModel from "../../../../models/profile.model";
 import { verifyToken } from "../../../../utils/token.utils";
-export const  githubRedirect = async (req: Request, res: Response) => {
+export const githubRedirect = async (req: Request, res: Response) => {
   try {
     const { token } = req.query;
-    
+
     if (!token) {
       return res.status(401).json({
         success: false,
         message: "Authentication token required",
       });
     }
-    
+
     // Verify the token
     try {
       const decoded = verifyToken(token as string);
       const userId = (decoded as any).userId;
-      
+
       // Store token in state to retrieve in callback
-      const redirectUri = `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/v1/integrations/github/callback`;
-      
+      const redirectUri = `${process.env.BACKEND_URL || "http://localhost:5000"}/api/v1/integrations/github/callback`;
+
       const githubAuthUrl =
         `https://github.com/login/oauth/authorize` +
-        `?client_id=${process.env.GITHUB_CLIENT_ID}` +
+        `?client_id=${process.env.CLIENT_ID_GITHUB}` +
         `&redirect_uri=${encodeURIComponent(redirectUri)}` +
         `&scope=read:user repo` +
         `&state=${token}`; // Pass token in state parameter
@@ -48,21 +48,21 @@ export const githubCallback = async (req: Request, res: Response) => {
   try {
     const { code, state } = req.query;
     const token = state as string; // Token from state parameter
-    
+
     if (!token) {
       return res.status(401).json({
         success: false,
         message: "Authentication required",
       });
     }
-    
+
     // Verify token
     const decoded = verifyToken(token as string);
     const userId = (decoded as any).userId;
-    
+
     // Exchange code for GitHub access token
-    const redirectUri = `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/v1/integrations/github/callback`;
-    
+    const redirectUri = `${process.env.BACKEND_URL || "http://localhost:5000"}/api/v1/integrations/github/callback`;
+
     const tokenResponse = await fetch(
       "https://github.com/login/oauth/access_token",
       {
@@ -72,12 +72,12 @@ export const githubCallback = async (req: Request, res: Response) => {
           Accept: "application/json",
         },
         body: JSON.stringify({
-          client_id: process.env.GITHUB_CLIENT_ID,
-          client_secret: process.env.GITHUB_CLIENT_SECRET,
+          client_id: process.env.CLIENT_ID_GITHUB,
+          client_secret: process.env.CLIENT_SECRET_GITHUB,
           code,
           redirect_uri: redirectUri,
         }),
-      }
+      },
     );
 
     const tokenData = await tokenResponse.json();
@@ -100,13 +100,13 @@ export const githubCallback = async (req: Request, res: Response) => {
         githubUsername: githubUser.login,
         githubConnected: true,
       },
-      { new: true } // Return updated document
+      { new: true }, // Return updated document
     );
 
     if (!updatedProfile) {
       console.error("Profile not found for userId:", userId);
       return res.redirect(
-        `${process.env.FRONTEND_URL}/dashboard/integrations?error=profile_not_found`
+        `${process.env.FRONTEND_URL}/dashboard/integrations?error=profile_not_found`,
       );
     }
 
@@ -115,12 +115,12 @@ export const githubCallback = async (req: Request, res: Response) => {
 
     // Redirect back to frontend
     return res.redirect(
-      `${process.env.FRONTEND_URL}/dashboard/integrations?github=connected`
+      `${process.env.FRONTEND_URL}/dashboard/integrations?github=connected`,
     );
   } catch (error: any) {
     console.error("GitHub callback error:", error);
     return res.redirect(
-      `${process.env.FRONTEND_URL}/dashboard/integrations?error=github_failed`
+      `${process.env.FRONTEND_URL}/dashboard/integrations?error=github_failed`,
     );
   }
 };
@@ -138,7 +138,7 @@ export const githubDisconnect = async (req: Request, res: Response) => {
         githubUsername: null,
         githubConnected: false,
       },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedProfile) {
