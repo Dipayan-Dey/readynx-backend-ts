@@ -1,13 +1,14 @@
 service: readynx-backend
-frameworkVersion: "3"
+frameworkVersion: '3'
 
 provider:
   name: aws
   runtime: nodejs18.x
   region: ap-south-1
-  stage: ${opt:stage, 'prod'}
+  stage: prod
   timeout: 30
   memorySize: 1024
+
   environment:
     NODE_ENV: production
     MONGO_URI: ${env:MONGO_URI}
@@ -35,36 +36,20 @@ package:
     - node_modules/**
     - package.json
     - package-lock.json
-    - "!src/**"
-    - "!**/*.ts"
-    - "!.git/**"
-    - "!.env"
-    - "!.env.*"
-    - "!tests/**"
-    - "!*.md"
-    - "!.gitignore"
-    - "!.dockerignore"
-    - "!docker-compose.yml"
-    - "!Dockerfile"
+    - '!src/**'
+    - '!**/*.ts'
+    - '!.git/**'
+    - '!.env'
+    - '!.env.*'
+    - '!tests/**'
+    - '!*.md'
+    - '!.gitignore'
+    - '!.dockerignore'
+    - '!docker-compose.yml'
+    - '!Dockerfile'
 
 functions:
   api:
     handler: dist/index.handler
     events:
-      - httpApi:
-          path: /{proxy+}
-          method: ANY
-      - httpApi:
-          path: /
-          method: ANY
-    vpc:
-      securityGroupIds: []
-      subnetIds: []
-
-plugins:
-  - serverless-offline
-
-custom:
-  serverless-offline:
-    httpPort: 5000
-    noPrependStageInUrl: true
+      - httpApi: '*'
