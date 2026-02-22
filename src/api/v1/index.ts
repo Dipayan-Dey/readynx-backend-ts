@@ -11,6 +11,7 @@ import profileRouter from "./routes/profile.routes";
 import chatbotRouter from "./routes/chatbot.routes";
 import liveInterviewRoute from "./routes/liveInterview.route";
 import mindmapRouter from "./routes/mindmap.routes";
+import feedbackRouter from "./routes/feedback.routes";
 
 const v1Router = Router();
 
@@ -26,5 +27,6 @@ v1Router.use("/profile", profileRouter);
 v1Router.use("/chatbot", chatbotRouter);
 v1Router.use("/live-interview", liveInterviewRoute);
 v1Router.use("/carrermap", mindmapRouter);
+v1Router.use("/feedback", feedbackRouter);
 
 export default v1Router;
