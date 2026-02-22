@@ -1,0 +1,50 @@
+name: Deploy to AWS Lambda
+
+on:
+  workflow_dispatch: 
+
+jobs:
+  deploy:
+    name: Deploy Serverless Service
+    runs-on: ubuntu-latest
+
+    steps:
+      - name:  Checkout code
+        uses: actions/checkout@v3
+
+      - name:  Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name:  Install dependencies
+        run: npm install
+
+      - name:  Build project
+        run: npm run build
+
+      - name:  Deploy with Serverless
+        uses: serverless/github-action@v3
+        with:
+          args: deploy --stage prod
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          PORT: ${{ secrets.PORT }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          CLOUD_NAME: ${{ secrets.CLOUD_NAME }}
+          CLOUD_API_KEY: ${{ secrets.CLOUD_API_KEY }}
+          CLOUD_API_SECRET: ${{ secrets.CLOUD_API_SECRET }}
+          CLIENT_ID_GITHUB: ${{ secrets.CLIENT_ID_GITHUB }}
+          CLIENT_SECRET_GITHUB: ${{ secrets.CLIENT_SECRET_GITHUB }}
+          REDIRECT_URI_GITHUB: ${{ secrets.REDIRECT_URI_GITHUB }}
+          LINKEDIN_CLIENT_ID: ${{ secrets.LINKEDIN_CLIENT_ID }}
+          LINKEDIN_CLIENT_SECRET: ${{ secrets.LINKEDIN_CLIENT_SECRET }}
+          LINKEDIN_REDIRECT_URI: ${{ secrets.LINKEDIN_REDIRECT_URI }}
+          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
