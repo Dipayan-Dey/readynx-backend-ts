@@ -174,6 +174,27 @@ export class QuizService {
       throw new Error("Failed to get quiz history: Unknown error");
     }
   }
+
+  async deleteQuizHistory(
+    sessionId: Types.ObjectId,
+    userId: Types.ObjectId,
+  ): Promise<void> {
+    try {
+      const session = await QuizSessionModel.findOneAndDelete({
+        _id: sessionId,
+        userId,
+      });
+
+      if (!session) {
+        throw new Error("Quiz session not found or unauthorized");
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to delete quiz session: ${error.message}`);
+      }
+      throw new Error("Failed to delete quiz session: Unknown error");
+    }
+  }
 }
 
 export default new QuizService();

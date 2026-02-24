@@ -5,6 +5,7 @@ import {
   startQuiz,
   submitQuizAnswers,
   getQuizHistory,
+  deleteQuizHistory,
 } from "../controllers/profile/quiz.controller";
 
 
@@ -21,5 +22,6 @@ quizRouter.post("/:sessionId/submit", authMiddleware, submitQuizAnswers);
 
 
 quizRouter.get("/history", authMiddleware, getQuizHistory);
+quizRouter.delete("/deletesession/:sessionId", authMiddleware, deleteQuizHistory);
 
 export default quizRouter;
