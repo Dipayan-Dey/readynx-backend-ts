@@ -16,6 +16,7 @@ app.use(
       "http://127.0.0.1:3000",
       "https://readynx.netlify.app",
       "https://readynx.dipayandey.site",
+      "https://d1l1xqtlq6ur2h.cloudfront.net"
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
