@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-// import { geminiModel } from "../config/gemini";
+
 import { makeGroqChatCompletion } from "./integrations/groq.service";
 import ProfileModel from "../models/profile.model";
 import ProjectModel from "../models/project.model";
